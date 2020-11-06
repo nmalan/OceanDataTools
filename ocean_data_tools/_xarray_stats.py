@@ -245,6 +245,9 @@ class Statistics(object):
             r = xys / (xss * yss) ** 0.5
             t = r * (df / ((1 - r) * (1 + r))) ** 0.5
             p = stats.distributions.t.sf(abs(t), df)
+            
+            # standard error
+            se = ((1 - r**2) * yss / xss / df)**0.5
 
             # first create variable for slope and adjust meta
             out["slope"] = slope
@@ -268,7 +271,12 @@ class Statistics(object):
                 "If p < 0.05 then the results " "from 'slope' are significant."
             )
             # out["pval"] = out.pval.where(out.slope.notnull())
-
+            
+            # and for the standard error
+            out["se"] = se  # dummy.copy()
+            out["se"].name += "_se"
+            out["se"].attrs["units"] = units
+            
         if return_trend:
             # from numpy import dot
             yhat = (slope * x + intercept).transpose(*xda.dims)
